@@ -1,0 +1,104 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
+    }
+}
+
+plugins {
+    id 'com.matthewprenger.cursegradle' version '1.0.6'
+}
+
+apply plugin: 'net.minecraftforge.gradle.forge'
+
+version = "0.0.1"
+group= "coffee.cypher.skills"
+archivesBaseName = "skills"
+
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
+
+minecraft {
+    version = "1.8.9-11.15.0.1718"
+    runDir = "run"
+    useDepAts = true
+   
+    mappings = "snapshot_20160123"
+}
+
+dependencies {
+    deobfCompile "mezz.jei:jei_1.8.9:2.16.2.78"
+}
+
+curseforge {
+    apiKey = project.curseForgeApiKey
+    project {
+        id = '224808'
+        mainArtifact(jar) {
+            displayName = 'Skills ' + version
+        }
+        releaseType = 'release'
+        changelog = file('./changelogs/' + version + '.txt')
+        if (version.contains('beta')) {
+            releaseType = 'beta'
+        }
+        if (version.contains('alpha')) {
+            releaseType = 'alpha'
+        }
+    }
+}
+
+repositories {
+    maven {
+        name = "Mobius Repo"
+        url = "http://mobiusstrip.eu/maven"
+    }
+    maven {
+        name = 'CB Repo'
+        url = "http://chickenbones.net/maven/"
+    }
+    maven {
+        name = "tehnut"
+        url = "http://tehnut.info/maven/"
+    }
+    maven {
+        name = "amadornes"
+        url = "http://maven.amadornes.com/"
+    }
+    maven {
+        name = "mezz"
+        url = "http://dvs1.progwml6.com/files/maven"
+    }
+}
+
+task devJar(type: Jar) {
+    from sourceSets.main.output
+    classifier = 'dev'
+}
+
+artifacts {
+    archives devJar
+}
+
+apply plugin: 'idea'
+
+processResources {
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+               
+        expand 'version':project.version, 'mcversion':project.minecraft.version
+    }
+      
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
