@@ -9,12 +9,12 @@ import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+@SuppressWarnings("unused")
 public final class Skills {
     private static Logger LOGGER;
     private static boolean initDone = false;
     private static SimpleNetworkWrapper NETWORK;
     private static String ID = "skills";
-    private static NBTTagCompound MAPS;
 
     static Logger log() {
         if (LOGGER == null) {

@@ -11,12 +11,11 @@ import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
-import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 
 import java.util.*;
 
-public final class ResearchProperty implements IExtendedEntityProperties {
+final class ResearchProperty implements IExtendedEntityProperties {
     public static final String NAME = "skills_researches";
     private static List<ResearchMap> maps = new ArrayList<>();
     private static NBTTagCompound oldMapTag;

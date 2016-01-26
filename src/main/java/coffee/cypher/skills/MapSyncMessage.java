@@ -9,7 +9,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import java.io.IOException;
 
-public class MapSyncMessage implements IMessage, IMessageHandler<MapSyncMessage, IMessage> {
+class MapSyncMessage implements IMessage, IMessageHandler<MapSyncMessage, IMessage> {
     NBTTagCompound tag;
 
     public MapSyncMessage() {}
