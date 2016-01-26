@@ -27,7 +27,7 @@ public final class ResearchMapState implements INBTSerializable<NBTTagCompound> 
     public NBTTagCompound serializeNBT() {
         NBTTagCompound tag = new NBTTagCompound();
         for (BiMap.Entry<ResearchNode, Integer> e : map.getNodes().entrySet()) {
-            tag.setInteger(e.getKey().getName(), state.get(e.getValue()).ordinal());
+            tag.setString(e.getKey().getName(), state.get(e.getValue()).name());
         }
         return tag;
     }
@@ -40,7 +40,7 @@ public final class ResearchMapState implements INBTSerializable<NBTTagCompound> 
 
         for (BiMap.Entry<ResearchNode, Integer> e : map.getNodes().entrySet()) {
             if (nbt.hasKey(e.getKey().getName())) {
-                state.put(e.getValue(), NodeState.values()[nbt.getInteger(e.getKey().getName())]);
+                state.put(e.getValue(), NodeState.valueOf(nbt.getString(e.getKey().getName())));
             } else {
                 state.put(e.getValue(), e.getKey().getDefaultState());
             }

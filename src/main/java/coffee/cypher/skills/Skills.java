@@ -45,8 +45,8 @@ public final class Skills {
 
         MinecraftForge.EVENT_BUS.register(new ResearchProperty.Handler());
 
-        network().registerMessage(new StateSyncMessage(), StateSyncMessage.class, 0, Side.CLIENT);
-        network().registerMessage(new MapSyncMessage(), MapSyncMessage.class, 1, Side.CLIENT);
+        network().registerMessage(new StateSyncHandler(), StateSyncMessage.class, 0, Side.CLIENT);
+        network().registerMessage(new MapSyncHandler(), MapSyncMessage.class, 1, Side.CLIENT);
 
         log().info("Skills initialized");
         initDone = true;

@@ -1,12 +1,11 @@
 package coffee.cypher.skills;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.common.util.INBTSerializable;
 
 import java.util.*;
 import java.util.function.Function;
 
-import static coffee.cypher.skills.ResearchMapState.*;
+import static coffee.cypher.skills.ResearchMapState.NodeState;
 
 public class ResearchNode {
     final List<ResearchNode> dependencies;
@@ -24,7 +23,7 @@ public class ResearchNode {
 
     private static ResearchNode deserialize0(NBTTagCompound tag) {
         String name = tag.getString("name");
-        NodeState defState = NodeState.values()[tag.getInteger("defaultState")];
+        NodeState defState = NodeState.valueOf(tag.getString("defaultState"));
         return new ResearchNode(name, defState);
     }
 

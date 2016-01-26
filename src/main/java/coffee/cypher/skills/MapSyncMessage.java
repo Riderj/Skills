@@ -4,13 +4,15 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import java.io.IOException;
 
-final class MapSyncMessage implements IMessage, IMessageHandler<MapSyncMessage, IMessage> {
+final class MapSyncMessage implements IMessage {
     private NBTTagCompound tag;
+
+    NBTTagCompound getTag() {
+        return tag;
+    }
 
     public MapSyncMessage() {}
 
@@ -34,9 +36,5 @@ final class MapSyncMessage implements IMessage, IMessageHandler<MapSyncMessage, 
         pb.writeNBTTagCompoundToBuffer(tag);
     }
 
-    @Override
-    public IMessage onMessage(MapSyncMessage message, MessageContext ctx) {
-        ResearchProperty.adaptToServerMaps(message.tag);
-        return null;
-    }
+
 }

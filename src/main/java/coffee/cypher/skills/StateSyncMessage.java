@@ -2,18 +2,23 @@ package coffee.cypher.skills;
 
 import coffee.cypher.skills.ResearchMapState.NodeState;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import java.util.HashMap;
 import java.util.Map;
 
-final class StateSyncMessage implements IMessage, IMessageHandler<StateSyncMessage, IMessage> {
+final class StateSyncMessage implements IMessage {
     private Map<Integer, NodeState> states;
     private ResearchMap map;
+
+    Map<Integer, NodeState> getStates() {
+        return states;
+    }
+
+    ResearchMap getMap() {
+        return map;
+    }
 
     public StateSyncMessage(ResearchMapState state) {
         this.map = state.getParentMap();
@@ -44,16 +49,5 @@ final class StateSyncMessage implements IMessage, IMessageHandler<StateSyncMessa
             pb.writeInt(e.getKey());
             pb.writeInt(e.getValue().ordinal());
         }
-    }
-
-    @Override
-    public IMessage onMessage(StateSyncMessage message, MessageContext ctx) {
-        Minecraft.getMinecraft().addScheduledTask(this::apply);
-        return null;
-    }
-
-    public void apply() {
-        ResearchMapState curState = ResearchProperty.getResearchMapState(Minecraft.getMinecraft().thePlayer, map);
-        curState.setState(states);
     }
 }
