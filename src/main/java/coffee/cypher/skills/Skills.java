@@ -11,6 +11,8 @@ import org.apache.logging.log4j.Logger;
 
 @SuppressWarnings("unused")
 public final class Skills {
+    static final String VERSION = "0.1.0";
+
     private static Logger LOGGER;
     private static boolean initDone = false;
     private static SimpleNetworkWrapper NETWORK;
