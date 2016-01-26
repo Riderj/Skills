@@ -158,7 +158,7 @@ final class ResearchProperty implements IExtendedEntityProperties {
 
         @SubscribeEvent
         public void onServerLeave(ClientDisconnectionFromServerEvent event) {
-
+            ResearchProperty.resetClientMaps();
         }
     }
 }
