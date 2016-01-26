@@ -7,7 +7,7 @@ import net.minecraftforge.common.util.INBTSerializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ResearchMapState implements INBTSerializable<NBTTagCompound> {
+public final class ResearchMapState implements INBTSerializable<NBTTagCompound> {
     private Map<Integer, NodeState> state;
     private final ResearchMap map;
 
@@ -34,9 +34,48 @@ public class ResearchMapState implements INBTSerializable<NBTTagCompound> {
 
     @Override
     public void deserializeNBT(NBTTagCompound nbt) {
-        for (BiMap.Entry<ResearchNode, Integer> e : map.getNodes().entrySet()) {
-            state.put(e.getValue(), NodeState.values()[nbt.getInteger(e.getKey().getName())]);
+        if (nbt == null) {
+            nbt = new NBTTagCompound();
         }
+
+        for (BiMap.Entry<ResearchNode, Integer> e : map.getNodes().entrySet()) {
+            if (nbt.hasKey(e.getKey().getName())) {
+                state.put(e.getValue(), NodeState.values()[nbt.getInteger(e.getKey().getName())]);
+            } else {
+                state.put(e.getValue(), e.getKey().getDefaultState());
+            }
+        }
+    }
+
+    public void setState(ResearchNode node, NodeState nodeState) {
+        state.put(map.getId(node), nodeState);
+
+        refreshState();
+    }
+
+    private void refreshState() {
+        for (Map.Entry<Integer, NodeState> e : state.entrySet()) {
+            ResearchNode node = map.getNode(e.getKey());
+            if ((e.getValue() == NodeState.LOCKED) && node.prerequisitesCleared(this)) {
+                e.setValue(NodeState.AVAILABLE);
+            }
+
+            if ((e.getValue() == NodeState.AVAILABLE) && !node.prerequisitesCleared(this)) {
+                e.setValue(NodeState.LOCKED);
+            }
+        }
+    }
+
+    public ResearchMap getParentMap() {
+        return map;
+    }
+
+    Map<Integer, NodeState> getState() {
+        return state;
+    }
+
+    void setState(Map<Integer, NodeState> state) {
+        this.state = state;
     }
 
     public enum NodeState {
