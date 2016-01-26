@@ -68,9 +68,12 @@ final class ResearchProperty implements IExtendedEntityProperties {
 
             getResearchMap(name).deserializeNBT(tag.getCompoundTag(name));
         }
+        Skills.log().info("Loaded " + maps.size() + " maps with a total of " +
+                maps.stream().mapToInt(m -> m.getNodes().size()).sum() + " nodes");
     }
 
     static void adaptToServerMaps(NBTTagCompound tag) {
+        Skills.log().info("Adapting to server's research mappings");
         if (oldMapTag == null) {
             oldMapTag = serializeMaps();
         }
@@ -78,6 +81,7 @@ final class ResearchProperty implements IExtendedEntityProperties {
     }
 
     static void resetClientMaps() {
+        Skills.log().info("Returning to original research mappings");
         deserializeMaps(oldMapTag);
         oldMapTag = null;
     }

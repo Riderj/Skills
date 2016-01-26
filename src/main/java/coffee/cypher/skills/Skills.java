@@ -9,6 +9,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.function.Function;
+
 @SuppressWarnings("unused")
 public final class Skills {
     static final String VERSION = "0.1.0";
@@ -78,5 +80,10 @@ public final class Skills {
     public static void sendMapToClient(EntityPlayerMP player, ResearchMap map) {
         init();
         network().sendTo(new StateSyncMessage(getMapState(player, map)), player);
+    }
+
+    public static void registerNodeDeserializer(String id, Function<NBTTagCompound, ResearchNode> des) {
+        init();
+        ResearchNode.registerDeserializer(id, des);
     }
 }

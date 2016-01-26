@@ -28,7 +28,7 @@ public class ResearchNode {
         return new ResearchNode(name, defState);
     }
 
-    NBTTagCompound serialize() {
+    protected NBTTagCompound serialize() {
         NBTTagCompound tag = new NBTTagCompound();
         tag.setString("name", name);
         tag.setString("deserializer", ID);
@@ -41,6 +41,8 @@ public class ResearchNode {
     }
 
     static void registerDeserializer(String id, Function<NBTTagCompound, ResearchNode> des) {
+        Skills.log().info("Registering deserializer function with ID " + id);
+
         if (deserializers.containsKey(id)) {
             throw new IllegalArgumentException("Node deserializer " + id + " already exists");
         }
