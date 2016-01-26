@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import java.util.HashMap;
 import java.util.Map;
 
-class StateSyncMessage implements IMessage, IMessageHandler<StateSyncMessage, IMessage> {
+final class StateSyncMessage implements IMessage, IMessageHandler<StateSyncMessage, IMessage> {
     private Map<Integer, NodeState> states;
     private ResearchMap map;
 

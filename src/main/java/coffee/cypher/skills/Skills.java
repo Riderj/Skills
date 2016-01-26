@@ -18,6 +18,8 @@ public final class Skills {
     private static SimpleNetworkWrapper NETWORK;
     private static String ID = "skills";
 
+    private Skills() {}
+
     static Logger log() {
         if (LOGGER == null) {
             LOGGER = LogManager.getLogger(ID);

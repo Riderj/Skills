@@ -17,23 +17,24 @@ public class ResearchMap implements INBTSerializable<NBTTagCompound> {
 
         nodes.forEach(ResearchNode::lock);
 
-        if (!isValid(nodes)) {
-            throw new IllegalArgumentException("Research map " + name +
-                    " contains dependency cycle and could not be registered");
-        }
-
         nodeIds = HashBiMap.create(nodes.size());
         int i = 0;
         for (ResearchNode n : nodes) {
             nodeIds.put(n, i++);
         }
+
+        validate();
     }
 
-    private boolean isValid(List<ResearchNode> nodes) {
+    private void validate() {
         HashSet<ResearchNode> scanned = new HashSet<>();
+        Set<ResearchNode> nodes = nodeIds.keySet();
         boolean scan = nodes.stream().filter(n -> n.getDependencies().isEmpty())
                 .allMatch(n -> isBranchValid(n, scanned, new HashSet<>()));
-        return scan && (scanned.size() == nodes.size());
+        if (!(scan && (scanned.size() == nodes.size()))) {
+            throw new IllegalArgumentException("Research map " + name +
+                    " contains dependency cycle and could not be registered");
+        }
     }
 
     private boolean isBranchValid(ResearchNode start, Set<ResearchNode> scanned, Set<ResearchNode> scanning) {
@@ -111,5 +112,7 @@ public class ResearchMap implements INBTSerializable<NBTTagCompound> {
                 e.getKey().dependants.add(getNode(id));
             }
         }
+
+        validate();
     }
 }
