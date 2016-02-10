@@ -4,12 +4,15 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
 import net.minecraftforge.common.util.INBTSerializable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ResearchMap implements INBTSerializable<NBTTagCompound> {
-    private final BiMap<ResearchNode, Integer> nodeIds;
+    private final BiMap<ResearchNode, String> nodeIds;
     private final String name;
 
     public ResearchMap(String name, List<ResearchNode> nodes) {
@@ -18,9 +21,9 @@ public class ResearchMap implements INBTSerializable<NBTTagCompound> {
         nodes.forEach(ResearchNode::lock);
 
         nodeIds = HashBiMap.create(nodes.size());
-        int i = 0;
+
         for (ResearchNode n : nodes) {
-            nodeIds.put(n, i++);
+            nodeIds.put(n, n.getName());
         }
 
         validate();
@@ -57,16 +60,12 @@ public class ResearchMap implements INBTSerializable<NBTTagCompound> {
         return true;
     }
 
-    final int getId(ResearchNode node) {
-        return nodeIds.get(node);
+    final ResearchNode getNode(String name) {
+        return nodeIds.inverse().get(name);
     }
 
-    final ResearchNode getNode(int id) {
-        return nodeIds.inverse().get(id);
-    }
-
-    final BiMap<ResearchNode, Integer> getNodes() {
-        return nodeIds;
+    final Set<ResearchNode> getNodes() {
+        return nodeIds.keySet();
     }
 
     public final String getName() {
@@ -77,16 +76,24 @@ public class ResearchMap implements INBTSerializable<NBTTagCompound> {
     public NBTTagCompound serializeNBT() {
         NBTTagCompound tag = new NBTTagCompound();
 
-        for (BiMap.Entry<ResearchNode, Integer> e : nodeIds.entrySet()) {
-            NBTTagCompound nodeTag = e.getKey().serialize();
+        for (ResearchNode e : nodeIds.keySet()) {
+            NBTTagCompound nodeTag = e.serialize();
 
-            int[] dependencies = e.getKey().getDependencies().stream().mapToInt(nodeIds::get).toArray();
-            nodeTag.setIntArray("dependencies", dependencies);
+            NBTTagList depTag1 = new NBTTagList();
+            e.getDependencies()
+                    .stream().map(ResearchNode::getName)
+                    .forEach(n -> depTag1.appendTag(new NBTTagString(n)));
 
-            int[] dependants = e.getKey().getDependants().stream().mapToInt(nodeIds::get).toArray();
-            nodeTag.setIntArray("dependants", dependants);
+            nodeTag.setTag("dependencies", depTag1);
 
-            tag.setTag(e.getValue().toString(), nodeTag);
+            NBTTagList depTag2 = new NBTTagList();
+            e.getDependants()
+                    .stream().map(ResearchNode::getName)
+                    .forEach(n -> depTag2.appendTag(new NBTTagString(n)));
+
+            nodeTag.setTag("dependants", depTag2);
+
+            tag.setTag(e.getName(), nodeTag);
         }
 
         return tag;
