@@ -15,7 +15,7 @@ public class StateSyncHandler implements IMessageHandler<StateSyncMessage, IMess
         return null;
     }
 
-    public void apply(ResearchMap map, Map<Integer, NodeState> states) {
+    public void apply(ResearchMap map, Map<ResearchNode, NodeState> states) {
         ResearchMapState curState = ResearchProperty.getResearchMapState(Minecraft.getMinecraft().thePlayer, map);
         curState.setState(states);
     }

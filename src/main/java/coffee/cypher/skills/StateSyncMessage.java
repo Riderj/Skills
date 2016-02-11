@@ -9,10 +9,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 final class StateSyncMessage implements IMessage {
-    private Map<Integer, NodeState> states;
+    private Map<ResearchNode, NodeState> states;
     private ResearchMap map;
 
-    Map<Integer, NodeState> getStates() {
+    Map<ResearchNode, NodeState> getStates() {
         return states;
     }
 
@@ -45,7 +45,7 @@ final class StateSyncMessage implements IMessage {
         pb.writeInt(name.length());
         pb.writeString(name);
         pb.writeInt(states.size());
-        for (Map.Entry<Integer, NodeState> e : states.entrySet()) {
+        for (Map.Entry<ResearchNode, NodeState> e : states.entrySet()) {
             pb.writeInt(e.getKey());
             pb.writeInt(e.getValue().ordinal());
         }

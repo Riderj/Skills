@@ -12,6 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class ResearchMap implements INBTSerializable<NBTTagCompound> {
+    private static final int STRING_ID = new NBTTagString("").getId();
     private final BiMap<ResearchNode, String> nodeIds;
     private final String name;
 
@@ -103,20 +104,27 @@ public class ResearchMap implements INBTSerializable<NBTTagCompound> {
     public void deserializeNBT(NBTTagCompound tag) {
         nodeIds.clear();
         for (String e : tag.getKeySet()) {
-            int id = Integer.parseInt(e);
             ResearchNode node = ResearchNode.deserialize(tag.getCompoundTag(e));
-            nodeIds.put(node, id);
+            nodeIds.put(node, node.getName());
         }
         
-        for (Map.Entry<ResearchNode, Integer> e : nodeIds.entrySet()) {
-            e.getKey().dependencies.clear();
-            for (int id : tag.getCompoundTag(e.getValue().toString()).getIntArray("dependencies")) {
-                e.getKey().dependencies.add(getNode(id));
+        for (ResearchNode e : nodeIds.keySet()) {
+            e.dependencies.clear();
+            NBTTagList dependencies = tag.getCompoundTag(e.getName())
+                    .getTagList("dependencies", STRING_ID);
+
+            for (int i = 0; i < dependencies.tagCount(); i++) {
+                String depName = dependencies.getStringTagAt(i);
+                e.dependencies.add(nodeIds.inverse().get(depName));
             }
 
-            e.getKey().dependants.clear();
-            for (int id : tag.getCompoundTag(e.getValue().toString()).getIntArray("dependants")) {
-                e.getKey().dependants.add(getNode(id));
+            e.dependants.clear();
+            NBTTagList dependants = tag.getCompoundTag(e.getName())
+                    .getTagList("dependants", STRING_ID);
+
+            for (int i = 0; i < dependants.tagCount(); i++) {
+                String depName = dependants.getStringTagAt(i);
+                e.dependants.add(nodeIds.inverse().get(depName));
             }
         }
 

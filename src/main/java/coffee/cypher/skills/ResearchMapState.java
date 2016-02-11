@@ -8,26 +8,26 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class ResearchMapState implements INBTSerializable<NBTTagCompound> {
-    private Map<Integer, NodeState> state;
+    private Map<ResearchNode, NodeState> state;
     private final ResearchMap map;
 
     public ResearchMapState(ResearchMap ref) {
         map = ref;
         state = new HashMap<>();
-        for (BiMap.Entry<ResearchNode, Integer> entry : map.getNodes().entrySet()) {
-            state.put(entry.getValue(), entry.getKey().getDefaultState());
+        for (ResearchNode entry : map.getNodes()) {
+            state.put(entry, entry.getDefaultState());
         }
     }
 
     public NodeState getStateOfNode(ResearchNode node) {
-        return state.get(map.getId(node));
+        return state.get(node);
     }
 
     @Override
     public NBTTagCompound serializeNBT() {
         NBTTagCompound tag = new NBTTagCompound();
-        for (BiMap.Entry<ResearchNode, Integer> e : map.getNodes().entrySet()) {
-            tag.setString(e.getKey().getName(), state.get(e.getValue()).name());
+        for (ResearchNode e : map.getNodes()) {
+            tag.setString(e.getName(), state.get(e).name());
         }
         return tag;
     }
@@ -38,24 +38,24 @@ public final class ResearchMapState implements INBTSerializable<NBTTagCompound> 
             nbt = new NBTTagCompound();
         }
 
-        for (BiMap.Entry<ResearchNode, Integer> e : map.getNodes().entrySet()) {
-            if (nbt.hasKey(e.getKey().getName())) {
-                state.put(e.getValue(), NodeState.valueOf(nbt.getString(e.getKey().getName())));
+        for (ResearchNode e : map.getNodes()) {
+            if (nbt.hasKey(e.getName())) {
+                state.put(e, NodeState.valueOf(nbt.getString(e.getName())));
             } else {
-                state.put(e.getValue(), e.getKey().getDefaultState());
+                state.put(e, e.getDefaultState());
             }
         }
     }
 
     public void setState(ResearchNode node, NodeState nodeState) {
-        state.put(map.getId(node), nodeState);
+        state.put(node, nodeState);
 
         refreshState();
     }
 
     private void refreshState() {
-        for (Map.Entry<Integer, NodeState> e : state.entrySet()) {
-            ResearchNode node = map.getNode(e.getKey());
+        for (Map.Entry<ResearchNode, NodeState> e : state.entrySet()) {
+            ResearchNode node = e.getKey();
             if ((e.getValue() == NodeState.LOCKED) && node.prerequisitesCleared(this)) {
                 e.setValue(NodeState.AVAILABLE);
             }
@@ -70,11 +70,11 @@ public final class ResearchMapState implements INBTSerializable<NBTTagCompound> 
         return map;
     }
 
-    Map<Integer, NodeState> getState() {
+    Map<ResearchNode, NodeState> getState() {
         return state;
     }
 
-    void setState(Map<Integer, NodeState> state) {
+    void setState(Map<ResearchNode, NodeState> state) {
         this.state = state;
     }
 
