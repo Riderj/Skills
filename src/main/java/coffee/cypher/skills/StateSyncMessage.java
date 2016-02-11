@@ -34,7 +34,7 @@ final class StateSyncMessage implements IMessage {
         map = ResearchProperty.getResearchMap(name);
         states = new HashMap<>();
         for (int i = pb.readInt(); i > 0; i--) {
-            states.put(pb.readInt(), NodeState.values()[pb.readInt()]);
+            states.put(map.getNodeFromHash(pb.readInt()), NodeState.values()[pb.readInt()]);
         }
     }
 
@@ -46,7 +46,7 @@ final class StateSyncMessage implements IMessage {
         pb.writeString(name);
         pb.writeInt(states.size());
         for (Map.Entry<ResearchNode, NodeState> e : states.entrySet()) {
-            pb.writeInt(e.getKey());
+            pb.writeInt(e.getKey().getName().hashCode());
             pb.writeInt(e.getValue().ordinal());
         }
     }

@@ -2,18 +2,20 @@ package coffee.cypher.skills;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraftforge.common.util.INBTSerializable;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class ResearchMap implements INBTSerializable<NBTTagCompound> {
     private static final int STRING_ID = new NBTTagString("").getId();
     private final BiMap<ResearchNode, String> nodeIds;
+    private final Map<Integer, ResearchNode> hashes;
     private final String name;
 
     public ResearchMap(String name, List<ResearchNode> nodes) {
@@ -22,9 +24,21 @@ public class ResearchMap implements INBTSerializable<NBTTagCompound> {
         nodes.forEach(ResearchNode::lock);
 
         nodeIds = HashBiMap.create(nodes.size());
+        hashes = HashBiMap.create(nodes.size());
 
         for (ResearchNode n : nodes) {
             nodeIds.put(n, n.getName());
+
+            if (hashes.containsKey(n.getName().hashCode())) {
+                if (n.getName().equals(hashes.get(n.getName().hashCode()).getName())) {
+                    throw new IllegalArgumentException("Detected nodes with same name in research map" + name);
+                }
+                throw new IllegalStateException("Detected hash collision between nodes " + n.getName()
+                        + " and " + hashes.get(n.getName().hashCode()).getName() + " in map " + name
+                        + ". Please report this incident to current maintainer of SkillsAPI");
+            }
+
+            hashes.put(n.getName().hashCode(), n);
         }
 
         validate();
@@ -61,12 +75,16 @@ public class ResearchMap implements INBTSerializable<NBTTagCompound> {
         return true;
     }
 
-    final ResearchNode getNode(String name) {
+    public final ResearchNode getNode(String name) {
         return nodeIds.inverse().get(name);
     }
 
     final Set<ResearchNode> getNodes() {
         return nodeIds.keySet();
+    }
+
+    final ResearchNode getNodeFromHash(int hash) {
+        return hashes.get(hash);
     }
 
     public final String getName() {
